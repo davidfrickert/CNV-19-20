@@ -1,4 +1,4 @@
-package pt.ist.meic.cnv.SudokuSolver;
+package pt.ist.meic.cnv.SudokuSolver.webapp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
