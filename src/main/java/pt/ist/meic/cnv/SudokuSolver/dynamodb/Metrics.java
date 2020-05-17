@@ -42,9 +42,7 @@ public class Metrics {
     private static String objectsParam = "New-Object-counter";
     private static String refArraysParam = "New-Reference-Array-counter";
 
-
     private static final String primaryKey = "id";
-
 
     static {
         PARAMS.add(primaryKey);
@@ -70,7 +68,49 @@ public class Metrics {
         newObjectCount = Long.parseLong(dynamoDBScanResult.get(objectsParam).getN());
         newMultiRefArrayCount = Long.parseLong(dynamoDBScanResult.get(multiRefParam).getN());
         newRefArrayCount = Long.parseLong(dynamoDBScanResult.get(refArraysParam).getN());
+    }
 
+    public Metrics(String id, String solverType, Integer lines, Integer columns, Long unassignedEntries, Long methodCount, Long newArrayCount, Long newObjectCount, Long newMultiRefArrayCount, Long newRefArrayCount) {
+        this.id = id;
+        this.solverType = solverType;
+        this.lines = lines;
+        this.columns = columns;
+        this.unassignedEntries = unassignedEntries;
+        this.methodCount = methodCount;
+        this.newArrayCount = newArrayCount;
+        this.newObjectCount = newObjectCount;
+        this.newMultiRefArrayCount = newMultiRefArrayCount;
+        this.newRefArrayCount = newRefArrayCount;
+    }
+
+    public static Metrics average(List<Metrics> metricsToMakeAvg) {
+        Integer lines, columns;
+        String solverType = null;
+        Long unassignedEntries, methodCount, newArrayCount, newObjectCount, newMultiRefArrayCount, newRefArrayCount;
+
+        lines = columns = 0;
+        unassignedEntries = methodCount = newArrayCount = newObjectCount = newMultiRefArrayCount
+                = newRefArrayCount = 0L;
+
+        for (Metrics m1 : metricsToMakeAvg) {
+            solverType = m1.getSolverType();
+            lines += m1.getLines();
+            columns += m1.getColumns();
+            unassignedEntries += m1.getUnassignedEntries();
+
+            methodCount += m1.getMethodCount();
+            newArrayCount += m1.getNewArrayCount();
+            newObjectCount += m1.getNewObjectCount();
+            newMultiRefArrayCount += m1.getNewMultiRefArrayCount();
+            newRefArrayCount += m1.getNewRefArrayCount();
+        }
+
+        return new Metrics(null, solverType, lines, columns, unassignedEntries, methodCount, newArrayCount, newObjectCount
+            ,newMultiRefArrayCount, newRefArrayCount);
+    }
+
+    public Long calculateLoad() {
+        return methodCount + newObjectCount + newMultiRefArrayCount + newRefArrayCount + (newArrayCount / 2);
     }
 
 

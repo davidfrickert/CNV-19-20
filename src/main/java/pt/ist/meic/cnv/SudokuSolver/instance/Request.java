@@ -3,11 +3,17 @@ package pt.ist.meic.cnv.SudokuSolver.instance;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.stepfunctions.model.MissingRequiredParameterException;
 import org.springframework.util.MultiValueMap;
+import pt.ist.meic.cnv.SudokuSolver.dynamodb.DynamoDBHelper;
+import pt.ist.meic.cnv.SudokuSolver.dynamodb.Metrics;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
 public class Request implements IRequest {
+
+    private static final String TABLE_NAME = "Server-metrics";
 
     private String solver;
     private Integer unassigned;
@@ -30,6 +36,25 @@ public class Request implements IRequest {
     //TODO
     @Override
     public long estimateRequestLoad() {
-        return 0;
+        DynamoDBHelper dbh = DynamoDBHelper.getInstance();
+        List<Metrics> metrics = DynamoDBHelper.convertGenericResults(dbh.scan(TABLE_NAME, getRequestParams()));
+        // case of existing previous requests similar to this one
+        if (metrics.size() > 0) {
+            Metrics avg = Metrics.average(metrics);
+            return avg.calculateLoad();
+        } else {
+            // no similar requests to this one - base heuristic
+            return (nLines * nColumns * 10) + unassigned;
+        }
+
+    }
+
+    public Map<String, Object> getRequestParams() {
+        return new HashMap<>() {{
+            put("Columns", 9);
+            put("Lines", 9);
+            put("Solver-Type", "DLX");
+            put("Unassigned-Entries", 81);
+        }};
     }
 }

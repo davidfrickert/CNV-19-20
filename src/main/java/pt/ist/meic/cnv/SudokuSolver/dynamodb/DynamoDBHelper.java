@@ -40,8 +40,16 @@ public class DynamoDBHelper {
 
     }
 
-    public DynamoDBHelper() {
+    private DynamoDBHelper() {
         init();
+    }
+
+    private static DynamoDBHelper INSTANCE;
+
+    public static DynamoDBHelper getInstance() {
+        if (INSTANCE == null)
+            INSTANCE = new DynamoDBHelper();
+        return INSTANCE;
     }
 
     public Condition makeEqualsCondition(Object value) {
