@@ -15,7 +15,9 @@
 	<description>Sudoku Solver - CNV 19/20 Project</description>
 
 	<properties>
-		<java.version>13</java.version>
+		<java.version>14</java.version>
+		<maven.compiler.source>14</maven.compiler.source>
+		<maven.compiler.target>14</maven.compiler.target>
 		<spring-cloud.version>Hoxton.SR3</spring-cloud.version>
 	</properties>
 
@@ -70,7 +72,16 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+					                <groupId>org.apache.maven.plugins</groupId>
+								                <artifactId>maven-compiler-plugin</artifactId>
+										<version>3.8.0</version>
+														                <configuration>
+		<source>14</source>
+		<target>14</target>
+		<forceJavaCompilerUse>true</forceJavaCompilerUse>			
+																												                    </configuration>
+																															                </plugin>
 		</plugins>
 	</build>
-
 </project>
