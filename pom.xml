@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>pt.ist.meic.cnv</groupId>
-	<artifactId>SudokuSolver</artifactId>
+	<artifactId>Sudoku LoadBalancer</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>SudokuSolver</name>
-	<description>Sudoku Solver - CNV 19/20 Project</description>
+	<name>Sudoku LoadBalancer</name>
+	<description>Sudoku Solver Load Balancer - CNV 19/20 Project</description>
 
 	<properties>
 		<java.version>13</java.version>
@@ -61,6 +61,14 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk</artifactId>
+			<version>1.11.774</version>
+		</dependency>
+
+
 
 	</dependencies>
 
