@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>pt.ist.meic.cnv</groupId>
-	<artifactId>Sudoku LoadBalancer</artifactId>
+	<artifactId>Sudoku-LoadBalancer</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Sudoku LoadBalancer</name>
 	<description>Sudoku Solver Load Balancer - CNV 19/20 Project</description>
