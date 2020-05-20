@@ -1,5 +1,3 @@
-package com.test;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,8 +30,13 @@ public class AutoScaler {
     private static AmazonEC2 ec2;
     private static AmazonCloudWatch cloudWatch;
     private HashMap<String, Double> instances = new HashMap<>();
+    private String instanceToDelete = "none";
     private Double maximumValue = 70D;
     private Double minimumValue = 30D;
+
+    public String getInstanceToDelete(){
+        return instanceToDelete;
+    }
 
     private static void init() throws Exception {
 
@@ -74,6 +77,7 @@ public class AutoScaler {
         for (Reservation reservation : reservations) {
             instancesTMP.addAll(reservation.getInstances());
         }
+
         System.out.println("total instances = " + instances.size());
         return instancesTMP;
     }
@@ -103,11 +107,28 @@ public class AutoScaler {
      * @param instanceId
      */
     private void terminateInstance(String instanceId){
-        if (instances.size() == 1) { return; }
+        if (instances.size() == 1 || instanceToDelete == "none") { return; }
         TerminateInstancesRequest termInstanceReq = new TerminateInstancesRequest();
         termInstanceReq.withInstanceIds(instanceId);
         ec2.terminateInstances(termInstanceReq);
         instances.remove(instanceId);
+
+    }
+
+    public void terminateInstance(){
+        if (instances.size() == 1 || instanceToDelete == "none") { return; }
+        
+        TerminateInstancesRequest termInstanceReq = new TerminateInstancesRequest();
+        termInstanceReq.withInstanceIds(instanceToDelete);
+        ec2.terminateInstances(termInstanceReq);
+        instances.remove(instanceToDelete);
+
+        instanceToDelete = "none";
+    }
+
+    private void setInstanceToDelete(String instanceID){
+        if (instanceToDelete != "None" || instances.size() == 1) { return; }
+        instanceToDelete = instanceID;
     }
 
     /**
@@ -119,7 +140,6 @@ public class AutoScaler {
             Thread.sleep(60000);
             updateInstances();
             checkIfActionNeeded();
-            
         }
     }
 
@@ -140,7 +160,8 @@ public class AutoScaler {
                 launchInstance();
             } else if (e < minimumValue) {
                 //System.out.println(e + " < " + minimumValue);
-                terminateInstance(inst);
+                //terminateInstance(inst);
+                setInstanceToDelete(inst);
             }
         }
     }
@@ -187,7 +208,6 @@ public class AutoScaler {
     }
 
     public static void main(String[] args) throws Exception {
-
         String inicialID = "i-00c12cde4ecc508ee";
         AutoScaler ast = new AutoScaler(inicialID);
         ast.loop();
