@@ -149,19 +149,25 @@ public class AutoScaler {
     public void checkIfActionNeeded(){
         Set<String> tmp = instances.keySet();
         Iterator<String> it = tmp.iterator();
+
+        double smallestCPU = 100D;
+        String tmpInstanceToDel = instanceToDelete;
         
         for (Double e : instances.values()) {
 
             String inst = it.next();
+
             //System.out.println(inst);
             //System.out.println(e);
             if (e > maximumValue) {
                 //System.out.println(e + " > " + maximumValue);
                 launchInstance();
-            } else if (e < minimumValue) {
+            } else if (e < minimumValue && tmpInstanceToDel.equals("none")) {
+                if (e < smallestCPU) {
+                    setInstanceToDelete(inst);
+                }
                 //System.out.println(e + " < " + minimumValue);
                 //terminateInstance(inst);
-                setInstanceToDelete(inst);
             }
         }
     }
