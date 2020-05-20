@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class SudokuRestController {
 
     private static final int MAX_RETRIES = 10;
-    private ConcurrentHashMap<String, InstanceInfo> currentInstances;
+    private ConcurrentHashMap<String, InstanceInfo> currentInstances = new ConcurrentHashMap<>();
 
     public InstanceInfo getBestInstance() throws NoInstanceAvailable {
         Optional<Map.Entry<Long, InstanceInfo>> optionalMin = calculateLoadOfAllInstances().entrySet().stream()
