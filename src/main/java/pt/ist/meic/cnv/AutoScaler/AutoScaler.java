@@ -1,3 +1,5 @@
+package com.test;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -59,9 +61,16 @@ public class AutoScaler {
         cloudWatch = AmazonCloudWatchClientBuilder.standard().withRegion("eu-west-1").withCredentials(new AWSStaticCredentialsProvider(credentials)).build();
     }
 
-    public AutoScaler(String inicialID) throws Exception {
+    public AutoScaler(String initialID) throws Exception {
         init();
-        instances.put(inicialID, 0D);
+        instances.put(initialID, 0D);
+    }
+
+    public AutoScaler() throws Exception{
+        init();
+        launchInstance();
+        String initialID = instances.keySet().iterator().next();
+        instances.put(initialID, 0D);
     }
 
     /**
@@ -127,7 +136,7 @@ public class AutoScaler {
     }
 
     private void setInstanceToDelete(String instanceID){
-        if (instanceToDelete != "None" || instances.size() == 1) { return; }
+        if (instances.size() == 1) { return; }
         instanceToDelete = instanceID;
     }
 
@@ -147,28 +156,41 @@ public class AutoScaler {
      * Checks if we need to terminate or launch a instance
      */
     public void checkIfActionNeeded(){
-        Set<String> tmp = instances.keySet();
-        Iterator<String> it = tmp.iterator();
+        Set<String> set = instances.keySet();
+        Iterator<String> it = set.iterator();
 
         double smallestCPU = 100D;
         String tmpInstanceToDel = instanceToDelete;
+
+        Double avg = 0D;
+        String tmp = "none";
         
         for (Double e : instances.values()) {
 
             String inst = it.next();
-
+            avg += e;
             //System.out.println(inst);
             //System.out.println(e);
-            if (e > maximumValue) {
+            /*if (e > maximumValue) {
                 //System.out.println(e + " > " + maximumValue);
-                launchInstance();
-            } else if (e < minimumValue && tmpInstanceToDel.equals("none")) {
-                if (e < smallestCPU) {
-                    setInstanceToDelete(inst);
-                }
+                //launchInstance();
+            } else */
+            if (e < minimumValue && tmpInstanceToDel.equals("none") && e < smallestCPU) {
+                
+                tmp = inst;
+                smallestCPU = e;
+                //setInstanceToDelete(inst);
                 //System.out.println(e + " < " + minimumValue);
                 //terminateInstance(inst);
             }
+        }
+
+        avg /= instances.size();
+
+        if (avg > maximumValue) {
+            launchInstance();
+        } else if(avg < minimumValue){
+            setInstanceToDelete(tmp);
         }
     }
 
