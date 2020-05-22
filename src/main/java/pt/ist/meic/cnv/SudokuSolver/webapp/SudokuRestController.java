@@ -21,16 +21,17 @@ public class SudokuRestController {
 
     private static final int MAX_RETRIES = 10;
     private ConcurrentHashMap<String, InstanceInfo> currentInstances = new ConcurrentHashMap<>();
+    private AutoScaler autoScaler;
 
-    {
-        String inicialID = "i-00c12cde4ecc508ee";
-        AutoScaler ast = null;
+
+    public SudokuRestController() {
         try {
-            ast = new AutoScaler();
-            ast.loop();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+                autoScaler = new AutoScaler();
+                autoScaler.loop();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
     }
 
     public InstanceInfo getBestInstance() throws NoInstanceAvailable {
