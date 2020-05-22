@@ -21,24 +21,11 @@ import java.util.stream.Collectors;
 public class SudokuRestController {
 
     private static final int MAX_RETRIES = 10;
-    private ConcurrentHashMap<String, InstanceInfo> currentInstances = new ConcurrentHashMap<>();
 
     @Autowired
-    private AutoScaler autoScaler;
+    private LoadBalancer loadBalancer;
 
-    public InstanceInfo getBestInstance() throws NoInstanceAvailable {
-        Optional<Map.Entry<Long, InstanceInfo>> optionalMin = calculateLoadOfAllInstances().entrySet().stream()
-                .min(Comparator.comparingLong(Map.Entry::getKey));
-        if (optionalMin.isPresent())
-            return optionalMin.get().getValue();
-        throw new NoInstanceAvailable("No instance available");
-    }
 
-    public Map<Long, InstanceInfo> calculateLoadOfAllInstances() {
-        return currentInstances.values().stream().map(instanceInfo ->
-                new AbstractMap.SimpleEntry<>(instanceInfo.calculateInstanceLoad(), instanceInfo)
-        ).collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
-    }
 
     @PostMapping("/sudoku")
     public String computeSudoku(@RequestBody String body,
@@ -52,7 +39,7 @@ public class SudokuRestController {
         int attempts = 0;
 
 
-            InstanceInfo bestInstance = getBestInstance();
+            InstanceInfo bestInstance = loadBalancer.getBestInstance();
 
             System.out.println("Params = " + params);
             System.out.println("Body = " + body);
@@ -100,7 +87,7 @@ public class SudokuRestController {
     @Override
     public String toString() {
         return "SudokuRestController{" +
-                "currentInstances=" + currentInstances +
+                "loadBalancer=" + loadBalancer +
                 '}';
     }
 }

@@ -29,6 +29,7 @@ import com.amazonaws.services.ec2.model.RunInstancesResult;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import pt.ist.meic.cnv.webapp.LoadBalancer;
 import pt.ist.meic.cnv.webapp.SudokuRestController;
 
 @Component
@@ -42,7 +43,7 @@ public class AutoScaler {
     private Double minimumValue = 30D;
 
     @Autowired
-    private SudokuRestController lbal;
+    private LoadBalancer lbal;
 
     public String getInstanceToDelete(){
         return instanceToDelete;
