@@ -12,6 +12,7 @@ import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch;
 import com.amazonaws.services.cloudwatch.AmazonCloudWatchClientBuilder;
 import com.amazonaws.services.cloudwatch.model.Dimension;
@@ -62,8 +63,8 @@ public class AutoScaler {
                     "location (~/.aws/credentials), and is in valid format.",
                     e);
         }
-        ec2 = AmazonEC2ClientBuilder.standard().withRegion("eu-west-1").withCredentials(new AWSStaticCredentialsProvider(credentials)).build();
-        cloudWatch = AmazonCloudWatchClientBuilder.standard().withRegion("eu-west-1").withCredentials(new AWSStaticCredentialsProvider(credentials)).build();
+        ec2 = AmazonEC2ClientBuilder.standard().withRegion(Regions.EU_WEST_1).withCredentials(new AWSStaticCredentialsProvider(credentials)).build();
+        cloudWatch = AmazonCloudWatchClientBuilder.standard().withRegion(Regions.EU_WEST_1).withCredentials(new AWSStaticCredentialsProvider(credentials)).build();
     }
 
     public AutoScaler(String initialID) throws Exception {
@@ -105,12 +106,12 @@ public class AutoScaler {
     private void launchInstance(){
         RunInstancesRequest runInstancesRequest = new RunInstancesRequest();
 
-        runInstancesRequest.withImageId("ami-0953f4885cd4a791b")
+        runInstancesRequest.withImageId("ami-0b458fe9058917a09")
                                .withInstanceType("t2.micro")
                                .withMinCount(1)
                                .withMaxCount(1)
-                               .withKeyName("CNV-2020")
-                               .withSecurityGroups("CNV-ssh+http");
+                               .withKeyName("ssh-eu")
+                               .withSecurityGroups("CNV");
 
         RunInstancesResult runInstancesResult = ec2.runInstances(runInstancesRequest);
 
