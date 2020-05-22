@@ -1,8 +1,8 @@
-package pt.ist.meic.cnv.SudokuSolver.dynamodb;
+package pt.ist.meic.cnv.webapp.SudokuSolver.dynamodb;
 
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import lombok.Getter;
-import pt.ist.meic.cnv.SudokuSolver.exception.MissingRequiredParameterException;
+import pt.ist.meic.cnv.webapp.SudokuSolver.exception.MissingRequiredParameterException;
 
 import java.util.Arrays;
 import java.util.List;

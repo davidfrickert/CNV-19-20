@@ -1,4 +1,4 @@
-package pt.ist.meic.cnv.AutoScaler;
+package pt.ist.meic.cnv.webapp.AutoScaler;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,9 +28,8 @@ import com.amazonaws.services.ec2.model.RunInstancesRequest;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
-import pt.ist.meic.cnv.SudokuSolver.webapp.SudokuRestController;
+import pt.ist.meic.cnv.webapp.SudokuRestController;
 
 @Component
 public class AutoScaler {
