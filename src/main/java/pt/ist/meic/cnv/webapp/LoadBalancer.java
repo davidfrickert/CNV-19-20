@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Component
-@Order(1)
+@Order(value = 1)
 public class LoadBalancer {
     private ConcurrentHashMap<String, InstanceInfo> currentInstances = new ConcurrentHashMap<>();
 
