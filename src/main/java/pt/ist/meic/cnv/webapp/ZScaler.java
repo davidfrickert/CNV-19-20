@@ -30,10 +30,11 @@ import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import pt.ist.meic.cnv.webapp.LoadBalancer;
 import pt.ist.meic.cnv.webapp.SudokuRestController;
 
-@Component
+@Service
 @Order(value = 2)
 public class ZScaler extends Thread {
 
