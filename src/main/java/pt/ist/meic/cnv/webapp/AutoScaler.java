@@ -34,7 +34,6 @@ import pt.ist.meic.cnv.webapp.LoadBalancer;
 import pt.ist.meic.cnv.webapp.SudokuRestController;
 
 @Component
-@Order(3)
 public class AutoScaler extends Thread {
 
     private static AmazonEC2 ec2;

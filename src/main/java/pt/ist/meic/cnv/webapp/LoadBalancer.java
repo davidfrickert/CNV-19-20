@@ -14,12 +14,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Component
-@Order(2)
 public class LoadBalancer {
     private ConcurrentHashMap<String, InstanceInfo> currentInstances = new ConcurrentHashMap<>();
-
-    @Autowired
-    private AutoScaler autoScaler;
 
     public InstanceInfo getBestInstance() throws NoInstanceAvailable {
         Optional<Map.Entry<Long, InstanceInfo>> optionalMin = calculateLoadOfAllInstances().entrySet().stream()
@@ -40,7 +36,6 @@ public class LoadBalancer {
     public String toString() {
         return "LoadBalancer{" +
                 "currentInstances=" + currentInstances +
-                ", autoScaler=" + autoScaler +
                 '}';
     }
 }

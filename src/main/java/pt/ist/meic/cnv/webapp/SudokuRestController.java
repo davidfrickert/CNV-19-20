@@ -15,7 +15,6 @@ import reactor.core.publisher.Mono;
 import java.util.*;
 
 @RestController
-@Order(1)
 public class SudokuRestController {
 
     private static final int MAX_RETRIES = 10;
