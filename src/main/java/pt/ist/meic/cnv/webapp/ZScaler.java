@@ -163,6 +163,7 @@ public class ZScaler extends Thread {
      */
     public void loop() throws InterruptedException {
         while (true) {
+            System.out.println("lballlll " + lbal);
             Thread.sleep(60000);
             updateInstances();
             checkIfActionNeeded();
