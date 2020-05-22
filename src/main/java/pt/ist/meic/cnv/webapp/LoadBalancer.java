@@ -1,6 +1,7 @@
 package pt.ist.meic.cnv.webapp;
 
 import com.amazonaws.services.directconnect.model.Loa;
+import com.amazonaws.services.ec2.model.Instance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -37,8 +38,8 @@ public class LoadBalancer {
         ).collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
     }
 
-    public void addInstance(String instanceName) {
-        currentInstances.put(instanceName, new InstanceInfo(instanceName));
+    public void addInstance(Instance instanceName) {
+        currentInstances.put(instanceName.getInstanceId(), new InstanceInfo(instanceName));
         System.out.println(currentInstances);
     }
 

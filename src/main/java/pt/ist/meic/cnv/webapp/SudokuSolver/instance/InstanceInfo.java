@@ -7,10 +7,10 @@ import java.util.List;
 
 @Data
 public class InstanceInfo implements IInstanceInfo{
-    private final String InstanceData;
+    private final Instance InstanceData;
     private List<Request> currentRequests;
 
-    public InstanceInfo(String instanceData) {
+    public InstanceInfo(Instance instanceData) {
         InstanceData = instanceData;
         currentRequests = new ArrayList<>();
     }

@@ -121,10 +121,10 @@ public class ZScaler extends Thread {
 
         RunInstancesResult runInstancesResult = ec2.runInstances(runInstancesRequest);
 
-        String newInstanceId = runInstancesResult.getReservation().getInstances().get(0).getInstanceId();
+        Instance newInstance = runInstancesResult.getReservation().getInstances().get(0);
 
-        instances.put(newInstanceId, 0D);
-        lbal.addInstance(newInstanceId);
+        instances.put(newInstance.getInstanceId(), 0D);
+        lbal.addInstance(newInstance);
 
     }
 
