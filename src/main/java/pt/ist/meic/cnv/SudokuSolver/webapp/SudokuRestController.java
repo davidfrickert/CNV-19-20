@@ -26,7 +26,7 @@ public class SudokuRestController {
         String inicialID = "i-00c12cde4ecc508ee";
         AutoScaler ast = null;
         try {
-            ast = new AutoScaler(inicialID);
+            ast = new AutoScaler();
             ast.loop();
         } catch (Exception e) {
             e.printStackTrace();
@@ -103,4 +103,11 @@ public class SudokuRestController {
 
     }
 
+
+    @Override
+    public String toString() {
+        return "SudokuRestController{" +
+                "currentInstances=" + currentInstances +
+                '}';
+    }
 }

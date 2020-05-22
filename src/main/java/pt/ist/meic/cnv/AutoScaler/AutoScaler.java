@@ -62,7 +62,6 @@ public class AutoScaler {
                     "location (~/.aws/credentials), and is in valid format.",
                     e);
         }
-        System.out.println("Autoscaler initialized.");
         ec2 = AmazonEC2ClientBuilder.standard().withRegion("eu-west-1").withCredentials(new AWSStaticCredentialsProvider(credentials)).build();
         cloudWatch = AmazonCloudWatchClientBuilder.standard().withRegion("eu-west-1").withCredentials(new AWSStaticCredentialsProvider(credentials)).build();
     }
@@ -76,6 +75,9 @@ public class AutoScaler {
         init();
         launchInstance();
         String initialID = instances.keySet().iterator().next();
+
+        System.out.println("Autoscaler initialized.");
+        System.out.println(lbal);
         instances.put(initialID, 0D);
     }
 
