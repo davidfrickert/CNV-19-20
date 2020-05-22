@@ -1,4 +1,4 @@
-package pt.ist.meic.cnv.webapp.AutoScaler;
+package pt.ist.meic.cnv.webapp;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,7 +35,7 @@ import pt.ist.meic.cnv.webapp.SudokuRestController;
 
 @Component
 @Order(value = 2)
-public class AutoScaler extends Thread {
+public class ZScaler extends Thread {
 
     private static AmazonEC2 ec2;
     private static AmazonCloudWatch cloudWatch;
@@ -72,12 +72,12 @@ public class AutoScaler extends Thread {
         cloudWatch = AmazonCloudWatchClientBuilder.standard().withRegion(Regions.EU_WEST_1).withCredentials(new AWSStaticCredentialsProvider(credentials)).build();
     }
 
-    public AutoScaler(String initialID) throws Exception {
+    public ZScaler(String initialID) throws Exception {
         init();
         instances.put(initialID, 0D);
     }
 
-    public AutoScaler() throws Exception{
+    public ZScaler() throws Exception{
         init();
         launchInstance();
         String initialID = instances.keySet().iterator().next();
