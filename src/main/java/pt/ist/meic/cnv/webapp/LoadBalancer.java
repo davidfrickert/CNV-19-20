@@ -1,8 +1,6 @@
 package pt.ist.meic.cnv.webapp;
 
-import com.amazonaws.services.directconnect.model.Loa;
 import com.amazonaws.services.ec2.model.Instance;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import pt.ist.meic.cnv.webapp.SudokuSolver.exception.NoInstanceAvailable;

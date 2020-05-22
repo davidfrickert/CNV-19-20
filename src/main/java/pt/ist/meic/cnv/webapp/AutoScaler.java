@@ -28,6 +28,7 @@ import com.amazonaws.services.ec2.model.RunInstancesRequest;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ import pt.ist.meic.cnv.webapp.SudokuRestController;
 
 @Service
 @Order(value = 2)
+@DependsOn({"LoadBalancer"})
 public class AutoScaler extends Thread {
 
     private static AmazonEC2 ec2;
