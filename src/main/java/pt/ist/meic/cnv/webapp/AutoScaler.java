@@ -83,7 +83,7 @@ public class AutoScaler extends Thread {
         System.out.println("Autoscaler initialized.");
         System.out.println(lbal);
         instances.put(initialID, 0D);
-        loop();
+        start();
     }
 
     /**
