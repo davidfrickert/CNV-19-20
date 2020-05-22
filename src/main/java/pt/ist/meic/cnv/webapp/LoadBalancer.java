@@ -1,6 +1,7 @@
 package pt.ist.meic.cnv.webapp;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import pt.ist.meic.cnv.webapp.SudokuSolver.exception.NoInstanceAvailable;
 import pt.ist.meic.cnv.webapp.SudokuSolver.instance.InstanceInfo;
@@ -13,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Component
+@Order(2)
 public class LoadBalancer {
     private ConcurrentHashMap<String, InstanceInfo> currentInstances = new ConcurrentHashMap<>();
 
@@ -33,10 +35,12 @@ public class LoadBalancer {
         ).collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
     }
 
+
     @Override
     public String toString() {
         return "LoadBalancer{" +
                 "currentInstances=" + currentInstances +
+                ", autoScaler=" + autoScaler +
                 '}';
     }
 }

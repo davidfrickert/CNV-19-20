@@ -1,6 +1,7 @@
 package pt.ist.meic.cnv.webapp;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import reactor.core.publisher.Mono;
 import java.util.*;
 
 @RestController
+@Order(1)
 public class SudokuRestController {
 
     private static final int MAX_RETRIES = 10;
