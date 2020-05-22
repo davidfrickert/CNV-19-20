@@ -80,12 +80,9 @@ public class ZScaler extends Thread {
 
     public ZScaler() throws Exception{
         init();
-        launchInstance();
-        String initialID = instances.keySet().iterator().next();
 
         System.out.println("Autoscaler initialized.");
-        System.out.println(lbal);
-        instances.put(initialID, 0D);
+
         start();
     }
 
@@ -164,10 +161,9 @@ public class ZScaler extends Thread {
      */
     public void loop() throws InterruptedException {
         while (true) {
-            System.out.println("lballlll " + lbal);
-            Thread.sleep(60000);
             updateInstances();
             checkIfActionNeeded();
+            Thread.sleep(60000);
         }
     }
 
@@ -184,6 +180,8 @@ public class ZScaler extends Thread {
      * Checks if we need to terminate or launch a instance
      */
     public void checkIfActionNeeded(){
+        System.out.println("lballlll " + lbal);
+
         Set<String> set = instances.keySet();
         Iterator<String> it = set.iterator();
 
@@ -215,7 +213,7 @@ public class ZScaler extends Thread {
 
         avg /= instances.size();
 
-        if (avg > maximumValue) {
+        if (avg > maximumValue || instances.isEmpty()) {
             launchInstance();
         } else if(avg < minimumValue){
             setInstanceToDelete(tmp);
