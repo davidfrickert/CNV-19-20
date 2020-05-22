@@ -33,7 +33,7 @@ import pt.ist.meic.cnv.webapp.LoadBalancer;
 import pt.ist.meic.cnv.webapp.SudokuRestController;
 
 @Component
-public class AutoScaler {
+public class AutoScaler extends Thread {
 
     private static AmazonEC2 ec2;
     private static AmazonCloudWatch cloudWatch;
@@ -164,6 +164,15 @@ public class AutoScaler {
             Thread.sleep(60000);
             updateInstances();
             checkIfActionNeeded();
+        }
+    }
+
+    @Override
+    public void run() {
+        try {
+            loop();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
