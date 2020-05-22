@@ -7,15 +7,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
-import pt.ist.meic.cnv.webapp.AutoScaler.AutoScaler;
-import pt.ist.meic.cnv.webapp.SudokuSolver.exception.NoInstanceAvailable;
 import pt.ist.meic.cnv.webapp.SudokuSolver.instance.InstanceInfo;
 import pt.ist.meic.cnv.webapp.SudokuSolver.instance.Request;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 @RestController
 public class SudokuRestController {
@@ -30,6 +26,8 @@ public class SudokuRestController {
     @PostMapping("/sudoku")
     public String computeSudoku(@RequestBody String body,
                                 @RequestParam MultiValueMap<String,String> params) {
+
+        System.out.println("lbal on controller: " + loadBalancer);
         // http://63.33.43.84:8080/sudoku?s=CP&un=81&n1=9&n2=9&i=SUDOKU_PUZZLE_9x9_101
         // {s=CP, un=81, n1=9, n2=9, i=SUDOKU_PUZZLE_9x9_101}
         // s = solver

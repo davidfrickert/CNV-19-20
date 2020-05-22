@@ -1,9 +1,7 @@
 package pt.ist.meic.cnv.webapp;
 
-import com.amazonaws.services.directconnect.model.Loa;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import pt.ist.meic.cnv.webapp.AutoScaler.AutoScaler;
 import pt.ist.meic.cnv.webapp.SudokuSolver.exception.NoInstanceAvailable;
 import pt.ist.meic.cnv.webapp.SudokuSolver.instance.InstanceInfo;
 
@@ -34,12 +32,6 @@ public class LoadBalancer {
                 new AbstractMap.SimpleEntry<>(instanceInfo.calculateInstanceLoad(), instanceInfo)
         ).collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
     }
-
-    public LoadBalancer() {
-        System.out.println("Initalized LB");
-        System.out.println("LB:AS: " + autoScaler);
-    }
-
 
     @Override
     public String toString() {

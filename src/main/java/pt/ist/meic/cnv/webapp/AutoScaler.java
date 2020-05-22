@@ -1,4 +1,4 @@
-package pt.ist.meic.cnv.webapp.AutoScaler;
+package pt.ist.meic.cnv.webapp;
 
 import java.util.ArrayList;
 import java.util.Date;
