@@ -1,5 +1,6 @@
 package pt.ist.meic.cnv.webapp;
 
+import com.amazonaws.services.directconnect.model.Loa;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pt.ist.meic.cnv.webapp.AutoScaler.AutoScaler;
@@ -32,6 +33,11 @@ public class LoadBalancer {
         return currentInstances.values().stream().map(instanceInfo ->
                 new AbstractMap.SimpleEntry<>(instanceInfo.calculateInstanceLoad(), instanceInfo)
         ).collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
+    }
+
+    public LoadBalancer() {
+        System.out.println("Initalized LB");
+        System.out.println("LB:AS: " + autoScaler);
     }
 
 
