@@ -1,12 +1,12 @@
 package pt.ist.meic.cnv.SudokuSolver.webapp;
 
-import com.amazonaws.services.ec2.model.Instance;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
+import pt.ist.meic.cnv.AutoScaler.AutoScaler;
 import pt.ist.meic.cnv.SudokuSolver.exception.NoInstanceAvailable;
 import pt.ist.meic.cnv.SudokuSolver.instance.InstanceInfo;
 import pt.ist.meic.cnv.SudokuSolver.instance.Request;
@@ -22,6 +22,17 @@ public class SudokuRestController {
     private static final int MAX_RETRIES = 10;
     private ConcurrentHashMap<String, InstanceInfo> currentInstances = new ConcurrentHashMap<>();
 
+    {
+        String inicialID = "i-00c12cde4ecc508ee";
+        AutoScaler ast = null;
+        try {
+            ast = new AutoScaler(inicialID);
+            ast.loop();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public InstanceInfo getBestInstance() throws NoInstanceAvailable {
         Optional<Map.Entry<Long, InstanceInfo>> optionalMin = calculateLoadOfAllInstances().entrySet().stream()
                 .min(Comparator.comparingLong(Map.Entry::getKey));
@@ -29,8 +40,6 @@ public class SudokuRestController {
             return optionalMin.get().getValue();
         throw new NoInstanceAvailable("No instance available");
     }
-
-
 
     public Map<Long, InstanceInfo> calculateLoadOfAllInstances() {
         return currentInstances.values().stream().map(instanceInfo ->
@@ -48,45 +57,47 @@ public class SudokuRestController {
         // n1,n2 = puzzle size
         // i = map
         int attempts = 0;
-        InstanceInfo bestInstance = getBestInstance();
 
-        System.out.println("Params = " + params);
-        System.out.println("Body = " + body);
-        while (attempts < MAX_RETRIES) {
-            String selectedServer = bestInstance.getInstanceData().getPublicIpAddress();
-            String port = "8000";
-            Request reqData = new Request(params);
-            bestInstance.addRequest(reqData);
-            WebClient.RequestHeadersSpec<?> req = WebClient
-                    .create("http://" + selectedServer + ":" + port)
-                    .post()
-                    .uri(uriBuilder -> uriBuilder.path("/sudoku")
-                            .queryParams(params).build())
-                    .body(BodyInserters.fromValue(body));
 
-            Mono<ClientResponse> clientResponse = req.exchange();
-            System.out.println("Waiting for computation...");
-            Optional<ClientResponse> optionalResponse = clientResponse.blockOptional();
-            System.out.println("Received Sudoku!");
+            InstanceInfo bestInstance = getBestInstance();
 
-            if (optionalResponse.isPresent()) {
-                ClientResponse response = optionalResponse.get();
+            System.out.println("Params = " + params);
+            System.out.println("Body = " + body);
+            while (attempts < MAX_RETRIES) {
+                String selectedServer = bestInstance.getInstanceData().getPublicIpAddress();
+                String port = "8000";
+                Request reqData = new Request(params);
+                bestInstance.addRequest(reqData);
+                WebClient.RequestHeadersSpec<?> req = WebClient
+                        .create("http://" + selectedServer + ":" + port)
+                        .post()
+                        .uri(uriBuilder -> uriBuilder.path("/sudoku")
+                                .queryParams(params).build())
+                        .body(BodyInserters.fromValue(body));
 
-                ClientResponse.Headers headers = response.headers();
-                HttpStatus statusCode = response.statusCode();
-                String bodyResponse = response.bodyToMono(String.class).block();
+                Mono<ClientResponse> clientResponse = req.exchange();
+                System.out.println("Waiting for computation...");
+                Optional<ClientResponse> optionalResponse = clientResponse.blockOptional();
+                System.out.println("Received Sudoku!");
 
-                System.out.println("body response:" + bodyResponse);
-                System.out.println("headers response:" + headers.asHttpHeaders());
-                System.out.println("statusCode response:" + statusCode);
+                if (optionalResponse.isPresent()) {
+                    ClientResponse response = optionalResponse.get();
 
-                bestInstance.removeRequest(reqData);
+                    ClientResponse.Headers headers = response.headers();
+                    HttpStatus statusCode = response.statusCode();
+                    String bodyResponse = response.bodyToMono(String.class).block();
 
-                return bodyResponse;
-            } else {
-                attempts++;
+                    System.out.println("body response:" + bodyResponse);
+                    System.out.println("headers response:" + headers.asHttpHeaders());
+                    System.out.println("statusCode response:" + statusCode);
+
+                    bestInstance.removeRequest(reqData);
+
+                    return bodyResponse;
+                } else {
+                    attempts++;
+                }
             }
-        }
 
         throw new IllegalStateException("Couldn't find compute unit after " + attempts + "attempts.");
 

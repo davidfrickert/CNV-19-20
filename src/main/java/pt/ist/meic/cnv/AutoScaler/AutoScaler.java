@@ -1,3 +1,5 @@
+package pt.ist.meic.cnv.AutoScaler;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,6 +26,8 @@ import com.amazonaws.services.ec2.model.Reservation;
 import com.amazonaws.services.ec2.model.RunInstancesRequest;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import pt.ist.meic.cnv.SudokuSolver.webapp.SudokuRestController;
 
 public class AutoScaler {
 
@@ -33,6 +37,9 @@ public class AutoScaler {
     private String instanceToDelete = "none";
     private Double maximumValue = 70D;
     private Double minimumValue = 30D;
+
+    @Autowired
+    private SudokuRestController lbal;
 
     public String getInstanceToDelete(){
         return instanceToDelete;
@@ -142,7 +149,7 @@ public class AutoScaler {
      * The loop that updates the measures and checks if we should launch or terminate instances
      * @throws InterruptedException
      */
-    private void loop() throws InterruptedException {
+    public void loop() throws InterruptedException {
         while (true) {
             Thread.sleep(60000);
             updateInstances();

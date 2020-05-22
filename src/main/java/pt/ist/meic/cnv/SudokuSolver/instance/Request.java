@@ -1,6 +1,5 @@
 package pt.ist.meic.cnv.SudokuSolver.instance;
 
-import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.stepfunctions.model.MissingRequiredParameterException;
 import org.springframework.util.MultiValueMap;
 import pt.ist.meic.cnv.SudokuSolver.dynamodb.DynamoDBHelper;
