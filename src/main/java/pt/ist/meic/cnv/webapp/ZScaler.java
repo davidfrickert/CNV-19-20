@@ -52,7 +52,7 @@ public class ZScaler extends Thread {
         return instanceToDelete;
     }
 
-    private static void init() throws Exception {
+    private static void init() {
 
         /*
          * The ProfileCredentialsProvider will return your [default]
@@ -78,7 +78,7 @@ public class ZScaler extends Thread {
         instances.put(initialID, 0D);
     }
 
-    public ZScaler() throws Exception{
+    public ZScaler() {
         init();
 
         System.out.println("Autoscaler initialized.");
