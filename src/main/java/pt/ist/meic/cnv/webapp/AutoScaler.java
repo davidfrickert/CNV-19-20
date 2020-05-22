@@ -36,7 +36,7 @@ import pt.ist.meic.cnv.webapp.SudokuRestController;
 
 @Service
 @Order(value = 2)
-public class ZScaler extends Thread {
+public class AutoScaler extends Thread {
 
     private static AmazonEC2 ec2;
     private static AmazonCloudWatch cloudWatch;
@@ -73,12 +73,12 @@ public class ZScaler extends Thread {
         cloudWatch = AmazonCloudWatchClientBuilder.standard().withRegion(Regions.EU_WEST_1).withCredentials(new AWSStaticCredentialsProvider(credentials)).build();
     }
 
-    public ZScaler(String initialID) throws Exception {
+    public AutoScaler(String initialID) throws Exception {
         init();
         instances.put(initialID, 0D);
     }
 
-    public ZScaler() {
+    public AutoScaler() {
         init();
 
         System.out.println("Autoscaler initialized.");
