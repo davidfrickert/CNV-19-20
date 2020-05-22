@@ -213,7 +213,8 @@ public class ZScaler extends Thread {
         }
 
         avg /= instances.size();
-
+        System.out.println("checking if need to launch instance...");
+        System.out.println("avg = " + avg + ", instances empty? " + instances.isEmpty());
         if (avg > maximumValue || instances.isEmpty()) {
             launchInstance();
         } else if(avg < minimumValue){
