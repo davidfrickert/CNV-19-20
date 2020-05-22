@@ -1,5 +1,6 @@
 package pt.ist.meic.cnv.SudokuSolver.webapp;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -21,17 +22,12 @@ public class SudokuRestController {
 
     private static final int MAX_RETRIES = 10;
     private ConcurrentHashMap<String, InstanceInfo> currentInstances = new ConcurrentHashMap<>();
+
+    @Autowired
     private AutoScaler autoScaler;
 
-
     public SudokuRestController() {
-        try {
-                autoScaler = new AutoScaler();
-                autoScaler.loop();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
+        System.out.println("Lbal initialized");
     }
 
     public InstanceInfo getBestInstance() throws NoInstanceAvailable {

@@ -28,8 +28,11 @@ import com.amazonaws.services.ec2.model.RunInstancesRequest;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 import pt.ist.meic.cnv.SudokuSolver.webapp.SudokuRestController;
 
+@Component
 public class AutoScaler {
 
     private static AmazonEC2 ec2;
@@ -104,6 +107,7 @@ public class AutoScaler {
      * launches a new instance
      */
     private void launchInstance(){
+        System.out.println("launched instance");
         RunInstancesRequest runInstancesRequest = new RunInstancesRequest();
 
         runInstancesRequest.withImageId("ami-0b458fe9058917a09")
@@ -134,7 +138,7 @@ public class AutoScaler {
     }
 
     public void terminateInstance(){
-        if (instances.size() == 1 || instanceToDelete == "none") { return; }
+        if (instances.size() == 1 || instanceToDelete.equals("none")) { return; }
         
         TerminateInstancesRequest termInstanceReq = new TerminateInstancesRequest();
         termInstanceReq.withInstanceIds(instanceToDelete);
