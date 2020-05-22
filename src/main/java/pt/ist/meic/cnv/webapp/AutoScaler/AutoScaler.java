@@ -249,9 +249,4 @@ public class AutoScaler {
         }
     }
 
-    public static void main(String[] args) throws Exception {
-        String inicialID = "i-00c12cde4ecc508ee";
-        AutoScaler ast = new AutoScaler(inicialID);
-        ast.loop();
-    }
 }

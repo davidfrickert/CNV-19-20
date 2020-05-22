@@ -26,10 +26,6 @@ public class SudokuRestController {
     @Autowired
     private AutoScaler autoScaler;
 
-    public SudokuRestController() {
-        System.out.println("Lbal initialized");
-    }
-
     public InstanceInfo getBestInstance() throws NoInstanceAvailable {
         Optional<Map.Entry<Long, InstanceInfo>> optionalMin = calculateLoadOfAllInstances().entrySet().stream()
                 .min(Comparator.comparingLong(Map.Entry::getKey));
