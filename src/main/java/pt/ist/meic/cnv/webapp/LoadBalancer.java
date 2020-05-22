@@ -1,5 +1,6 @@
 package pt.ist.meic.cnv.webapp;
 
+import com.amazonaws.services.directconnect.model.Loa;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,10 @@ import java.util.stream.Collectors;
 @Order(1)
 public class LoadBalancer {
     private ConcurrentHashMap<String, InstanceInfo> currentInstances = new ConcurrentHashMap<>();
+
+    public LoadBalancer() {
+        System.out.println("Lbal init");
+    }
 
     public InstanceInfo getBestInstance() throws NoInstanceAvailable {
         Optional<Map.Entry<Long, InstanceInfo>> optionalMin = calculateLoadOfAllInstances().entrySet().stream()
