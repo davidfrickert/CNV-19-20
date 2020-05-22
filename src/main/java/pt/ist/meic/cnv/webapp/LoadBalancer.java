@@ -37,6 +37,11 @@ public class LoadBalancer {
         ).collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
     }
 
+    public void addInstance(String instanceName) {
+        currentInstances.put(instanceName, new InstanceInfo(instanceName));
+        System.out.println(currentInstances);
+    }
+
 
     @Override
     public String toString() {

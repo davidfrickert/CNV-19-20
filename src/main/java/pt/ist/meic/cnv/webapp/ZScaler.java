@@ -124,6 +124,8 @@ public class ZScaler extends Thread {
         String newInstanceId = runInstancesResult.getReservation().getInstances().get(0).getInstanceId();
 
         instances.put(newInstanceId, 0D);
+        lbal.addInstance(newInstanceId);
+
     }
 
     /**
@@ -180,7 +182,6 @@ public class ZScaler extends Thread {
      * Checks if we need to terminate or launch a instance
      */
     public void checkIfActionNeeded(){
-        System.out.println("lballlll " + lbal);
 
         Set<String> set = instances.keySet();
         Iterator<String> it = set.iterator();
