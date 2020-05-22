@@ -83,6 +83,7 @@ public class AutoScaler {
         System.out.println("Autoscaler initialized.");
         System.out.println(lbal);
         instances.put(initialID, 0D);
+        loop();
     }
 
     /**
@@ -108,6 +109,7 @@ public class AutoScaler {
      */
     private void launchInstance(){
         System.out.println("launched instance");
+        System.out.println(lbal);
         RunInstancesRequest runInstancesRequest = new RunInstancesRequest();
 
         runInstancesRequest.withImageId("ami-0b458fe9058917a09")
