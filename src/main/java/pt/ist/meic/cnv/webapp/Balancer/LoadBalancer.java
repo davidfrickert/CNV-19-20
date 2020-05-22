@@ -1,4 +1,4 @@
-package pt.ist.meic.cnv.webapp;
+package pt.ist.meic.cnv.webapp.Balancer;
 
 import com.amazonaws.services.ec2.model.Instance;
 import org.springframework.core.annotation.Order;
@@ -14,7 +14,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Component
-@Order(value = 1)
 public class LoadBalancer {
     private ConcurrentHashMap<String, InstanceInfo> currentInstances = new ConcurrentHashMap<>();
 

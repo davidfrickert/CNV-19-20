@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
+import pt.ist.meic.cnv.webapp.Balancer.LoadBalancer;
 import pt.ist.meic.cnv.webapp.SudokuSolver.instance.InstanceInfo;
 import pt.ist.meic.cnv.webapp.SudokuSolver.instance.Request;
 import reactor.core.publisher.Mono;
