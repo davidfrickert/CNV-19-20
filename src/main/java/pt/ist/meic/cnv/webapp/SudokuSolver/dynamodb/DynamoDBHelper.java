@@ -97,7 +97,6 @@ public class DynamoDBHelper {
 
         ScanRequest scanRequest = new ScanRequest(tableName).withScanFilter(scanFilter);
         ScanResult scanResult = dynamoDBClient.scan(scanRequest);
-        System.out.println("Result: " + scanResult);
 
         List<Map<String, AttributeValue>> results = scanResult.getItems();
         return results;

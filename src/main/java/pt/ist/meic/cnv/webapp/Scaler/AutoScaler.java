@@ -48,7 +48,7 @@ public class AutoScaler extends Thread {
     @Autowired
     private LoadBalancer lbal;
 
-    public String getInstanceToDelete(){
+    public String getInstanceToDelete() {
         return instanceToDelete;
     }
 
@@ -262,6 +262,7 @@ public class AutoScaler extends Thread {
                 }
 
                 instances.put(name, avg);
+                lbal.addInstance(instance);
             } 
         }
     }

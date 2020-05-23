@@ -22,7 +22,9 @@ public class LoadBalancer {
     }
 
     public InstanceInfo getBestInstance() throws NoInstanceAvailable {
-        Optional<Map.Entry<Long, InstanceInfo>> optionalMin = calculateLoadOfAllInstances().entrySet().stream()
+        Map<Long, InstanceInfo> allInstanceLoads = calculateLoadOfAllInstances();
+        System.out.println("All loads: " + allInstanceLoads);
+        Optional<Map.Entry<Long, InstanceInfo>> optionalMin = allInstanceLoads.entrySet().stream()
                 .min(Comparator.comparingLong(Map.Entry::getKey));
         if (optionalMin.isPresent())
             return optionalMin.get().getValue();
@@ -36,8 +38,8 @@ public class LoadBalancer {
     }
 
     public void addInstance(Instance instanceName) {
-        currentInstances.put(instanceName.getInstanceId(), new InstanceInfo(instanceName));
-        System.out.println(currentInstances);
+        if (! currentInstances.containsKey(instanceName.getInstanceId()))
+            currentInstances.put(instanceName.getInstanceId(), new InstanceInfo(instanceName));
     }
 
     public InstanceInfo removeInstance(String instanceID) {

@@ -45,6 +45,7 @@ public class SudokuRestController {
         while (attempts < MAX_RETRIES) {
             try {
                 InstanceInfo bestInstance = loadBalancer.getBestInstance();
+                System.out.println("Load Balancer selected " + bestInstance.getInstanceData().getInstanceId());
 
                 System.out.println("Params = " + params);
                 System.out.println("Body = " + body);
