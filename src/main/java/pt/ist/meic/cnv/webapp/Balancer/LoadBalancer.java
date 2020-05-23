@@ -22,18 +22,18 @@ public class LoadBalancer {
     }
 
     public InstanceInfo getBestInstance() throws NoInstanceAvailable {
-        Map<Long, InstanceInfo> allInstanceLoads = calculateLoadOfAllInstances();
+        Map<InstanceInfo, Long> allInstanceLoads = calculateLoadOfAllInstances();
         System.out.println("All loads: " + allInstanceLoads);
-        Optional<Map.Entry<Long, InstanceInfo>> optionalMin = allInstanceLoads.entrySet().stream()
-                .min(Comparator.comparingLong(Map.Entry::getKey));
+        Optional<Map.Entry<InstanceInfo, Long>> optionalMin = allInstanceLoads.entrySet().stream()
+                .min(Comparator.comparingLong(Map.Entry::getValue));
         if (optionalMin.isPresent())
-            return optionalMin.get().getValue();
+            return optionalMin.get().getKey();
         throw new NoInstanceAvailable("No instance available");
     }
 
-    public Map<Long, InstanceInfo> calculateLoadOfAllInstances() {
+    public Map<InstanceInfo, Long> calculateLoadOfAllInstances() {
         return currentInstances.values().stream().map(instanceInfo ->
-                new AbstractMap.SimpleEntry<>(instanceInfo.calculateInstanceLoad(), instanceInfo)
+                new AbstractMap.SimpleEntry<>(instanceInfo, instanceInfo.calculateInstanceLoad())
         ).collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
     }
 
