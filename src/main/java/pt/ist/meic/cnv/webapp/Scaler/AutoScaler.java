@@ -41,7 +41,8 @@ public class AutoScaler extends Thread {
     private String instanceToDelete = "none";
     private Double maximumValue = 70D;
     private Double minimumValue = 30D;
-
+    private final String amiID = "ami-0953f4885cd4a791b";
+    
     @Autowired
     private LoadBalancer lbal;
 
@@ -94,7 +95,10 @@ public class AutoScaler extends Thread {
         List<Reservation> reservations = describeInstancesResult.getReservations();
         System.out.println("total reservations = " + reservations.size());
         for (Reservation reservation : reservations) {
-            instancesTMP.addAll(reservation.getInstances());
+            for (Instance i : reservation.getInstances()) {
+                if(i.getImageId().equals(amiID))
+                    instancesTMP.add(i);
+            }
         }
 
         System.out.println("total instances = " + instances.size());
@@ -109,7 +113,7 @@ public class AutoScaler extends Thread {
         System.out.println(lbal);
         RunInstancesRequest runInstancesRequest = new RunInstancesRequest();
 
-        runInstancesRequest.withImageId("ami-0b458fe9058917a09")
+        runInstancesRequest.withImageId(amiID)
                                .withInstanceType("t2.micro")
                                .withMinCount(1)
                                .withMaxCount(1)
