@@ -40,6 +40,10 @@ public class LoadBalancer {
         System.out.println(currentInstances);
     }
 
+    public InstanceInfo removeInstance(String instanceID) {
+        return currentInstances.remove(instanceID);
+    }
+
 
     @Override
     public String toString() {

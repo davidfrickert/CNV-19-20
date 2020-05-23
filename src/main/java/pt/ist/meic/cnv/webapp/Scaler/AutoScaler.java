@@ -27,10 +27,12 @@ import com.amazonaws.services.ec2.model.Reservation;
 import com.amazonaws.services.ec2.model.RunInstancesRequest;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import pt.ist.meic.cnv.webapp.Balancer.LoadBalancer;
+import pt.ist.meic.cnv.webapp.SudokuSolver.instance.InstanceInfo;
 
 @Service
 public class AutoScaler extends Thread {
@@ -41,7 +43,7 @@ public class AutoScaler extends Thread {
     private String instanceToDelete = "none";
     private Double maximumValue = 70D;
     private Double minimumValue = 30D;
-    private final String amiID = "ami-0e598ef086503a5a7";
+    private final String amiID = "ami-0200f098c4d50a07f";
     
     @Autowired
     private LoadBalancer lbal;
@@ -135,11 +137,11 @@ public class AutoScaler extends Thread {
      */
     private void terminateInstance(String instanceId){
         if (instances.size() == 1 || instanceToDelete == "none") { return; }
-        TerminateInstancesRequest termInstanceReq = new TerminateInstancesRequest();
-        termInstanceReq.withInstanceIds(instanceId);
-        ec2.terminateInstances(termInstanceReq);
-        instances.remove(instanceId);
 
+        InstanceInfo IInfo = lbal.removeInstance(instanceId);
+
+        Thread waitForRequestsToFinish = new Thread(new WaitForReqsToFinish(IInfo));
+        waitForRequestsToFinish.start();
     }
 
     public void terminateInstance(){
@@ -263,5 +265,27 @@ public class AutoScaler extends Thread {
             } 
         }
     }
+
+    @Data
+    public class WaitForReqsToFinish implements Runnable {
+        private final InstanceInfo instanceInfo;
+
+        @Override
+        public void run() {
+            while (! instanceInfo.getCurrentRequests().isEmpty()) {
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            TerminateInstancesRequest termInstanceReq = new TerminateInstancesRequest();
+            String instanceId = instanceInfo.getInstanceData().getInstanceId();
+            termInstanceReq.withInstanceIds();
+            ec2.terminateInstances(termInstanceReq);
+            instances.remove(instanceId);
+        }
+    }
+
 
 }
