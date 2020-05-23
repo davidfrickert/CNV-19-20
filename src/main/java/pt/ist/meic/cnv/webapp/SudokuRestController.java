@@ -31,7 +31,6 @@ public class SudokuRestController {
     public String computeSudoku(@RequestBody String body,
                                 @RequestParam MultiValueMap<String,String> params) {
 
-        System.out.println("lbal on controller: " + loadBalancer);
         // http://63.33.43.84:8080/sudoku?s=CP&un=81&n1=9&n2=9&i=SUDOKU_PUZZLE_9x9_101
         // {s=CP, un=81, n1=9, n2=9, i=SUDOKU_PUZZLE_9x9_101}
         // s = solver

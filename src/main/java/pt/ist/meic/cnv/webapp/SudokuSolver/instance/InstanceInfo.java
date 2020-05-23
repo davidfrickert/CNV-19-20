@@ -27,4 +27,13 @@ public class InstanceInfo implements IInstanceInfo{
     public void removeRequest(Request r) {
         currentRequests.remove(r);
     }
+
+
+    @Override
+    public String toString() {
+        return "InstanceInfo{" +
+                "InstanceID=" + InstanceData.getInstanceId() +
+                ", calculateInstanceLoad=" + calculateInstanceLoad() +
+                '}';
+    }
 }
