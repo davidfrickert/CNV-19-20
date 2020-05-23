@@ -41,12 +41,13 @@ public class SudokuRestController {
         int attempts = 0;
 
 
-        InstanceInfo bestInstance = loadBalancer.getBestInstance();
 
-        System.out.println("Params = " + params);
-        System.out.println("Body = " + body);
         while (attempts < MAX_RETRIES) {
             try {
+                InstanceInfo bestInstance = loadBalancer.getBestInstance();
+
+                System.out.println("Params = " + params);
+                System.out.println("Body = " + body);
                 String selectedServer = bestInstance.getInstanceData().getPrivateIpAddress();
 
                 String port = "8000";
@@ -79,8 +80,9 @@ public class SudokuRestController {
 
                     return bodyResponse;
                 }
-            } catch (NoInstanceAvailable ignored) {
+            } catch (Exception exc) {
                 try {
+                    System.out.println("Exception caught: " + exc);
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
