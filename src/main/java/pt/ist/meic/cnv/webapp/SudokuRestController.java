@@ -9,6 +9,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import pt.ist.meic.cnv.webapp.Balancer.LoadBalancer;
+import pt.ist.meic.cnv.webapp.SudokuSolver.exception.NoInstanceAvailable;
 import pt.ist.meic.cnv.webapp.SudokuSolver.instance.InstanceInfo;
 import pt.ist.meic.cnv.webapp.SudokuSolver.instance.Request;
 import reactor.core.publisher.Mono;
@@ -40,11 +41,12 @@ public class SudokuRestController {
         int attempts = 0;
 
 
-            InstanceInfo bestInstance = loadBalancer.getBestInstance();
+        InstanceInfo bestInstance = loadBalancer.getBestInstance();
 
-            System.out.println("Params = " + params);
-            System.out.println("Body = " + body);
-            while (attempts < MAX_RETRIES) {
+        System.out.println("Params = " + params);
+        System.out.println("Body = " + body);
+        while (attempts < MAX_RETRIES) {
+            try {
                 String selectedServer = bestInstance.getInstanceData().getPublicIpAddress();
                 String port = "8000";
                 Request reqData = new Request(params);
@@ -75,10 +77,16 @@ public class SudokuRestController {
                     bestInstance.removeRequest(reqData);
 
                     return bodyResponse;
-                } else {
-                    attempts++;
+                }
+            } catch (NoInstanceAvailable ignored) {
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
+            attempts++;
+        }
 
         throw new IllegalStateException("Couldn't find compute unit after " + attempts + "attempts.");
 
