@@ -47,7 +47,8 @@ public class SudokuRestController {
         System.out.println("Body = " + body);
         while (attempts < MAX_RETRIES) {
             try {
-                String selectedServer = bestInstance.getInstanceData().getPublicIpAddress();
+                String selectedServer = bestInstance.getInstanceData().getPrivateIpAddress();
+
                 String port = "8000";
                 Request reqData = new Request(params);
                 bestInstance.addRequest(reqData);
