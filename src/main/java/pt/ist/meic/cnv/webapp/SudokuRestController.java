@@ -27,7 +27,7 @@ public class SudokuRestController {
 
 
 
-    @PostMapping("/sudoku")
+    @PostMapping(value = "/sudoku", produces = "application/json")
     public String computeSudoku(@RequestBody String body,
                                 @RequestParam MultiValueMap<String,String> params) {
 
