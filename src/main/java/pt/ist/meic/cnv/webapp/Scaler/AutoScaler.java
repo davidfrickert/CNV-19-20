@@ -41,7 +41,7 @@ public class AutoScaler extends Thread {
     private String instanceToDelete = "none";
     private Double maximumValue = 70D;
     private Double minimumValue = 30D;
-    private final String amiID = "ami-0b458fe9058917a09";
+    private final String amiID = "ami-0e598ef086503a5a7";
     
     @Autowired
     private LoadBalancer lbal;
