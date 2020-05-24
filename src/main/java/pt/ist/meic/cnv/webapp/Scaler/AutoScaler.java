@@ -270,7 +270,7 @@ public class AutoScaler extends Thread {
             }
             TerminateInstancesRequest termInstanceReq = new TerminateInstancesRequest();
             String instanceId = instanceInfo.getInstanceData().getInstanceId();
-            termInstanceReq.withInstanceIds();
+            termInstanceReq.withInstanceIds(instanceId);
             ec2.terminateInstances(termInstanceReq);
             instances.remove(instanceId);
             instanceToDelete = "none";
