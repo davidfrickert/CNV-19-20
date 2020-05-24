@@ -168,6 +168,8 @@ public class AutoScaler extends Thread {
         while (true) {
             updateInstances();
             checkIfActionNeeded();
+            if(instanceToDelete.equals("none"))
+                setInstanceToDelete(getBestInstance().getInstanceId());
             Thread.sleep(60000);
         }
     }
@@ -185,44 +187,17 @@ public class AutoScaler extends Thread {
      * Checks if we need to terminate or launch a instance
      */
     public void checkIfActionNeeded(){
-
-        Set<String> set = instances.keySet();
-        Iterator<String> it = set.iterator();
-
-        double smallestCPU = 100D;
-        String tmpInstanceToDel = instanceToDelete;
-
         Double avg = 0D;
-        String tmp = "none";
         
         for (Double e : instances.values()) {
-
-            String inst = it.next();
             avg += e;
-            //System.out.println(inst);
-            //System.out.println(e);
-            /*if (e > maximumValue) {
-                //System.out.println(e + " > " + maximumValue);
-                //launchInstance();
-            } else */
-            if (e < minimumValue && tmpInstanceToDel.equals("none") && e < smallestCPU) {
-                
-                tmp = inst;
-                smallestCPU = e;
-                //setInstanceToDelete(inst);
-                //System.out.println(e + " < " + minimumValue);
-                //terminateInstance(inst);
-            }
         }
 
         avg /= instances.size();
-        System.out.println("checking if need to launch instance...");
-        System.out.println("avg = " + avg + ", instances empty? " + instances.isEmpty());
-        if (avg > maximumValue || instances.isEmpty()) {
+
+        if (avg > maximumValue) {
             launchInstance();
-        } else if(avg < minimumValue){
-            setInstanceToDelete(tmp);
-        }
+        } 
     }
 
     /**
