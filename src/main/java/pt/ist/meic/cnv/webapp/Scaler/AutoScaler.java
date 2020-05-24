@@ -216,7 +216,7 @@ public class AutoScaler extends Thread {
 
         Set<Instance> instancesTMP = getInstances();
 
-        long offsetInMilliseconds = 1000 * 60 * 10;
+        long offsetInMilliseconds = 1000 * 60 * 5;
         Dimension instanceDimension = new Dimension();
         instanceDimension.setName("InstanceId");
         List<Dimension> dims = new ArrayList<Dimension>();
