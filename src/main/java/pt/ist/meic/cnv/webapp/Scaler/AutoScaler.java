@@ -196,7 +196,7 @@ public class AutoScaler extends Thread {
 
         avg /= instances.size();
 
-        if (avg > maximumValue) {
+        if (avg > maximumValue || instances.isEmpty()) {
             launchInstance();
         }
 
