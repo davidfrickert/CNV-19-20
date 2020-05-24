@@ -137,7 +137,7 @@ public class AutoScaler extends Thread {
      */
     private void terminateInstance(String instanceId){
         if (instances.size() == 1 || instanceToDelete.equals("none")) { return; }
-
+        System.out.println("Terminating " + instanceId);
         InstanceInfo IInfo = lbal.removeInstance(instanceId);
 
         if (IInfo != null) {
@@ -195,16 +195,17 @@ public class AutoScaler extends Thread {
         }
 
         avg /= instances.size();
-
+        System.out.println("CPU AVG: " + avg);
         if (avg > maximumValue || instances.isEmpty()) {
             launchInstance();
         }
 
         if (avg < minimumValue) {
             String bestInstance = lbal.getBestInstance().getInstanceData().getInstanceId();
-            if(instanceToDelete.equals("none"))
+            if(instanceToDelete.equals("none")) {
                 setInstanceToDelete(bestInstance);
-            terminateInstance(bestInstance);
+                terminateInstance(bestInstance);
+            }
         }
     }
 
