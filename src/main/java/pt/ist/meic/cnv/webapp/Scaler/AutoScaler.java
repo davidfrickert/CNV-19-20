@@ -136,12 +136,14 @@ public class AutoScaler extends Thread {
      * @param instanceId
      */
     private void terminateInstance(String instanceId){
-        if (instances.size() == 1 || instanceToDelete == "none") { return; }
+        if (instances.size() == 1 || instanceToDelete.equals("none")) { return; }
 
         InstanceInfo IInfo = lbal.removeInstance(instanceId);
 
-        Thread waitForRequestsToFinish = new Thread(new WaitForReqsToFinish(IInfo));
-        waitForRequestsToFinish.start();
+        if (IInfo != null) {
+            Thread waitForRequestsToFinish = new Thread(new WaitForReqsToFinish(IInfo));
+            waitForRequestsToFinish.start();
+        }
     }
 
     public void terminateInstance(){
@@ -168,8 +170,7 @@ public class AutoScaler extends Thread {
         while (true) {
             updateInstances();
             checkIfActionNeeded();
-            if(instanceToDelete.equals("none"))
-                setInstanceToDelete(getBestInstance().getInstanceId());
+
             Thread.sleep(60000);
         }
     }
@@ -197,7 +198,14 @@ public class AutoScaler extends Thread {
 
         if (avg > maximumValue) {
             launchInstance();
-        } 
+        }
+
+        if (avg < minimumValue) {
+            String bestInstance = lbal.getBestInstance().getInstanceData().getInstanceId();
+            if(instanceToDelete.equals("none"))
+                setInstanceToDelete(bestInstance);
+            terminateInstance(bestInstance);
+        }
     }
 
     /**
@@ -260,6 +268,7 @@ public class AutoScaler extends Thread {
             termInstanceReq.withInstanceIds();
             ec2.terminateInstances(termInstanceReq);
             instances.remove(instanceId);
+            instanceToDelete = "none";
         }
     }
 
