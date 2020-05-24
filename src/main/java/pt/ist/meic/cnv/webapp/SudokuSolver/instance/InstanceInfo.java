@@ -8,7 +8,7 @@ import java.util.List;
 @Data
 public class InstanceInfo implements IInstanceInfo{
     private final Instance InstanceData;
-    private List<Request> currentRequests;
+    private final List<Request> currentRequests;
 
     public InstanceInfo(Instance instanceData) {
         InstanceData = instanceData;
@@ -17,7 +17,9 @@ public class InstanceInfo implements IInstanceInfo{
 
     @Override
     public long calculateInstanceLoad() {
-        return getCurrentRequests().stream().map(IRequest::estimateRequestLoad).reduce(0L, Long::sum);
+        synchronized (currentRequests) {
+            return getCurrentRequests().stream().map(IRequest::estimateRequestLoad).reduce(0L, Long::sum);
+        }
     }
 
     public void addRequest(Request r) {
