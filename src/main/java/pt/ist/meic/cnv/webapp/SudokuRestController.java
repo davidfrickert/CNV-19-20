@@ -82,7 +82,8 @@ public class SudokuRestController {
                 }
             } catch (Exception exc) {
                 try {
-                    System.out.println("Exception caught: " + exc);
+                    System.out.println("Exception caught: " + exc + ", stack trace below");
+                    exc.printStackTrace();
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
