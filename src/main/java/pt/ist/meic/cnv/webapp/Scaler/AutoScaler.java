@@ -255,6 +255,10 @@ public class AutoScaler extends Thread {
     public class WaitForReqsToFinish implements Runnable {
         private final InstanceInfo instanceInfo;
 
+        public WaitForReqsToFinish(InstanceInfo instanceInfo) {
+            this.instanceInfo = instanceInfo;
+        }
+
         @Override
         public void run() {
             while (! instanceInfo.getCurrentRequests().isEmpty()) {
