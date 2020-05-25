@@ -1,4 +1,4 @@
-package pt.ist.meic.cnv.webapp.SudokuSolver.instance;
+package pt.ist.meic.cnv.SudokuSolver.balancer;
 
 import com.amazonaws.services.ec2.model.Instance;
 import lombok.Data;

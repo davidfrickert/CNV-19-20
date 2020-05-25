@@ -1,10 +1,8 @@
-package pt.ist.meic.cnv.webapp.Balancer;
+package pt.ist.meic.cnv.SudokuSolver.balancer;
 
 import com.amazonaws.services.ec2.model.Instance;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import pt.ist.meic.cnv.webapp.SudokuSolver.exception.NoInstanceAvailable;
-import pt.ist.meic.cnv.webapp.SudokuSolver.instance.InstanceInfo;
+import pt.ist.meic.cnv.SudokuSolver.balancer.exception.NoInstanceAvailable;
 
 import java.util.AbstractMap;
 import java.util.Comparator;

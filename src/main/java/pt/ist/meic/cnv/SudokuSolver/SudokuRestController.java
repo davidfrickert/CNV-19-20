@@ -1,4 +1,4 @@
-package pt.ist.meic.cnv.webapp;
+package pt.ist.meic.cnv.SudokuSolver;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
@@ -8,10 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
-import pt.ist.meic.cnv.webapp.Balancer.LoadBalancer;
-import pt.ist.meic.cnv.webapp.SudokuSolver.exception.NoInstanceAvailable;
-import pt.ist.meic.cnv.webapp.SudokuSolver.instance.InstanceInfo;
-import pt.ist.meic.cnv.webapp.SudokuSolver.instance.Request;
+import pt.ist.meic.cnv.SudokuSolver.balancer.LoadBalancer;
+import pt.ist.meic.cnv.SudokuSolver.balancer.InstanceInfo;
+import pt.ist.meic.cnv.SudokuSolver.balancer.Request;
 import reactor.core.publisher.Mono;
 
 import java.util.*;

@@ -1,13 +1,12 @@
-package pt.ist.meic.cnv.webapp.SudokuSolver.dynamodb;
+package pt.ist.meic.cnv.SudokuSolver.dynamodb;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
-import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.model.*;
-import pt.ist.meic.cnv.webapp.SudokuSolver.exception.MissingRequiredParameterException;
+import pt.ist.meic.cnv.SudokuSolver.balancer.exception.MissingRequiredParameterException;
 
 
 import java.util.*;

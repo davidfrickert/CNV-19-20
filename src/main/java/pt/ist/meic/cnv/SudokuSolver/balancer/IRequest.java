@@ -1,4 +1,4 @@
-package pt.ist.meic.cnv.webapp.SudokuSolver.instance;
+package pt.ist.meic.cnv.SudokuSolver.balancer;
 
 public interface IRequest {
     long estimateRequestLoad();

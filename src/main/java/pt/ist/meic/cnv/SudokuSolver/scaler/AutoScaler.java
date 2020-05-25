@@ -1,10 +1,9 @@
-package pt.ist.meic.cnv.webapp.Scaler;
+package pt.ist.meic.cnv.SudokuSolver.scaler;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -29,10 +28,9 @@ import com.amazonaws.services.ec2.model.RunInstancesResult;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
-import pt.ist.meic.cnv.webapp.Balancer.LoadBalancer;
-import pt.ist.meic.cnv.webapp.SudokuSolver.instance.InstanceInfo;
+import pt.ist.meic.cnv.SudokuSolver.balancer.LoadBalancer;
+import pt.ist.meic.cnv.SudokuSolver.balancer.InstanceInfo;
 
 @Service
 public class AutoScaler extends Thread {
