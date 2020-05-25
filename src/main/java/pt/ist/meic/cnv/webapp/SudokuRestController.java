@@ -20,7 +20,7 @@ import java.util.*;
 @Order(value = 3)
 public class SudokuRestController {
 
-    private static final int MAX_RETRIES = 10;
+    private static final int MAX_RETRIES = 50;
 
     @Autowired
     private LoadBalancer loadBalancer;
