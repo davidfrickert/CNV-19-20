@@ -37,13 +37,19 @@ public class Request implements IRequest {
     public long estimateRequestLoad() {
         DynamoDBHelper dbh = DynamoDBHelper.getInstance();
         List<Metrics> metrics = DynamoDBHelper.convertGenericResults(dbh.scan(TABLE_NAME, getRequestParams()));
+        System.out.println("Estimating request load:");
+        System.out.println(metrics);
         // case of existing previous requests similar to this one
         if (metrics.size() > 0) {
             Metrics avg = Metrics.average(metrics);
-            return avg.calculateLoad();
+            long load = avg.calculateLoad();
+            System.out.println("Estimated by dynamodb: " + load);
+            return load;
         } else {
             // no similar requests to this one - base heuristic
-            return (nLines * nColumns * 10) + unassigned;
+            long load = (nLines * nColumns * 10) + unassigned;
+            System.out.println("Estimated by heuristic: " + load);
+            return load;
         }
 
     }
