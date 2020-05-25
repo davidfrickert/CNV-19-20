@@ -171,7 +171,7 @@ public class AutoScaler extends Thread {
             updateInstances();
             checkIfActionNeeded();
 
-            Thread.sleep(300000);
+            Thread.sleep(180000);
         }
     }
 
