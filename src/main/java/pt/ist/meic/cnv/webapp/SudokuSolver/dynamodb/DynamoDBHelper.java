@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 public class DynamoDBHelper {
 
     private AmazonDynamoDB dynamoDBClient;
-    private DynamoDB dynamoDB;
 
     private void init() {
         ProfileCredentialsProvider credentialsProvider = new ProfileCredentialsProvider();
@@ -35,9 +34,6 @@ public class DynamoDBHelper {
                 .withCredentials(credentialsProvider)
                 .withRegion(Regions.EU_WEST_1)
                 .build();
-        dynamoDB = new DynamoDB(dynamoDBClient);
-
-
     }
 
     private DynamoDBHelper() {
@@ -98,24 +94,10 @@ public class DynamoDBHelper {
         ScanRequest scanRequest = new ScanRequest(tableName).withScanFilter(scanFilter);
         ScanResult scanResult = dynamoDBClient.scan(scanRequest);
 
-        System.out.println("requesting: " + scanRequest);
-
         return scanResult.getItems();
     }
 
     public static List<Metrics>  convertGenericResults(List<Map<String, AttributeValue>> resultsDynamoDB) {
         return resultsDynamoDB.stream().map(Metrics::new).collect(Collectors.toList());
     }
-
-    public static void main(String[] args) {
-        DynamoDBHelper dbh = new DynamoDBHelper();
-        List<Map<String, AttributeValue>> res = dbh.scan("Server-metrics", new HashMap<>() {{
-            put("Columns", 9);
-            put("Lines", 9);
-            put("Solver-Type", "DLX");
-            put("Unassigned-Entries", 81);
-        }});
-        List<Metrics> metricsReturned = convertGenericResults(res);
-    }
-
 }

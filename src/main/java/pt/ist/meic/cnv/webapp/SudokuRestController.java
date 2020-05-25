@@ -47,7 +47,6 @@ public class SudokuRestController {
                 System.out.println("Load Balancer selected " + bestInstance.getInstanceData().getInstanceId());
 
                 System.out.println("Params = " + params);
-                System.out.println("Body = " + body);
                 String selectedServer = bestInstance.getInstanceData().getPrivateIpAddress();
 
                 String port = "8000";
