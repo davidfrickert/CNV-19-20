@@ -56,10 +56,10 @@ public class Request implements IRequest {
 
     public Map<String, Object> getRequestParams() {
         return new HashMap<>() {{
-            put("Columns", 9);
-            put("Lines", 9);
-            put("Solver-Type", "DLX");
-            put("Unassigned-Entries", 81);
+            put("Columns", nColumns);
+            put("Lines", nLines);
+            put("Solver-Type", solver);
+            put("Unassigned-Entries", unassigned);
         }};
     }
 }
