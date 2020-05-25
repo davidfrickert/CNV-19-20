@@ -98,8 +98,9 @@ public class DynamoDBHelper {
         ScanRequest scanRequest = new ScanRequest(tableName).withScanFilter(scanFilter);
         ScanResult scanResult = dynamoDBClient.scan(scanRequest);
 
-        List<Map<String, AttributeValue>> results = scanResult.getItems();
-        return results;
+        System.out.println("requesting: " + scanRequest);
+
+        return scanResult.getItems();
     }
 
     public static List<Metrics>  convertGenericResults(List<Map<String, AttributeValue>> resultsDynamoDB) {

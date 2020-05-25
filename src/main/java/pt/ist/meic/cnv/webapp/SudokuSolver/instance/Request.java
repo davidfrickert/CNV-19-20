@@ -32,7 +32,7 @@ public class Request implements IRequest {
         nLines = Integer.parseInt(requestParameters.get("n2"));
 
     }
-    //TODO
+
     @Override
     public long estimateRequestLoad() {
         DynamoDBHelper dbh = DynamoDBHelper.getInstance();
