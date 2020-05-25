@@ -94,9 +94,9 @@ public class Metrics {
 
         for (Metrics m1 : metricsToMakeAvg) {
             solverType = m1.getSolverType();
-            lines += m1.getLines();
-            columns += m1.getColumns();
-            unassignedEntries += m1.getUnassignedEntries();
+            lines = m1.getLines();
+            columns = m1.getColumns();
+            unassignedEntries = m1.getUnassignedEntries();
 
             methodCount += m1.getMethodCount();
             newArrayCount += m1.getNewArrayCount();
@@ -104,6 +104,14 @@ public class Metrics {
             newMultiRefArrayCount += m1.getNewMultiRefArrayCount();
             newRefArrayCount += m1.getNewRefArrayCount();
         }
+
+        long nMetrics = metricsToMakeAvg.size();
+
+        methodCount /= nMetrics;
+        newArrayCount /= nMetrics;
+        newObjectCount /= nMetrics;
+        newMultiRefArrayCount /= nMetrics;
+        newRefArrayCount /= nMetrics;
 
         return new Metrics(null, solverType, lines, columns, unassignedEntries, methodCount, newArrayCount, newObjectCount
             ,newMultiRefArrayCount, newRefArrayCount);
