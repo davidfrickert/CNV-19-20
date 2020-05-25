@@ -1,4 +1,4 @@
-package pt.ist.meic.cnv.SudokuSolver.dynamodb;
+package pt.ist.meic.cnv.webapp.SudokuSolver.dynamodb;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
@@ -7,7 +7,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.model.*;
-import pt.ist.meic.cnv.SudokuSolver.exception.MissingRequiredParameterException;
+import pt.ist.meic.cnv.webapp.SudokuSolver.exception.MissingRequiredParameterException;
 
 
 import java.util.*;
@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 public class DynamoDBHelper {
 
     private AmazonDynamoDB dynamoDBClient;
-    private DynamoDB dynamoDB;
 
     private void init() {
         ProfileCredentialsProvider credentialsProvider = new ProfileCredentialsProvider();
@@ -35,9 +34,6 @@ public class DynamoDBHelper {
                 .withCredentials(credentialsProvider)
                 .withRegion(Regions.EU_WEST_1)
                 .build();
-        dynamoDB = new DynamoDB(dynamoDBClient);
-
-
     }
 
     private DynamoDBHelper() {
@@ -97,25 +93,11 @@ public class DynamoDBHelper {
 
         ScanRequest scanRequest = new ScanRequest(tableName).withScanFilter(scanFilter);
         ScanResult scanResult = dynamoDBClient.scan(scanRequest);
-        System.out.println("Result: " + scanResult);
 
-        List<Map<String, AttributeValue>> results = scanResult.getItems();
-        return results;
+        return scanResult.getItems();
     }
 
     public static List<Metrics>  convertGenericResults(List<Map<String, AttributeValue>> resultsDynamoDB) {
         return resultsDynamoDB.stream().map(Metrics::new).collect(Collectors.toList());
     }
-
-    public static void main(String[] args) {
-        DynamoDBHelper dbh = new DynamoDBHelper();
-        List<Map<String, AttributeValue>> res = dbh.scan("Server-metrics", new HashMap<>() {{
-            put("Columns", 9);
-            put("Lines", 9);
-            put("Solver-Type", "DLX");
-            put("Unassigned-Entries", 81);
-        }});
-        List<Metrics> metricsReturned = convertGenericResults(res);
-    }
-
 }

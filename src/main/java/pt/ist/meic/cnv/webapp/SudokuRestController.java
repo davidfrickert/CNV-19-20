@@ -1,55 +1,36 @@
-package pt.ist.meic.cnv.SudokuSolver.webapp;
+package pt.ist.meic.cnv.webapp;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
-import pt.ist.meic.cnv.AutoScaler.AutoScaler;
-import pt.ist.meic.cnv.SudokuSolver.exception.NoInstanceAvailable;
-import pt.ist.meic.cnv.SudokuSolver.instance.InstanceInfo;
-import pt.ist.meic.cnv.SudokuSolver.instance.Request;
+import pt.ist.meic.cnv.webapp.Balancer.LoadBalancer;
+import pt.ist.meic.cnv.webapp.SudokuSolver.exception.NoInstanceAvailable;
+import pt.ist.meic.cnv.webapp.SudokuSolver.instance.InstanceInfo;
+import pt.ist.meic.cnv.webapp.SudokuSolver.instance.Request;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 @RestController
+@Order(value = 3)
 public class SudokuRestController {
 
-    private static final int MAX_RETRIES = 10;
-    private ConcurrentHashMap<String, InstanceInfo> currentInstances = new ConcurrentHashMap<>();
+    private static final int MAX_RETRIES = 50;
 
-    {
-        String inicialID = "i-00c12cde4ecc508ee";
-        AutoScaler ast = null;
-        try {
-            ast = new AutoScaler();
-            ast.loop();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    @Autowired
+    private LoadBalancer loadBalancer;
 
-    public InstanceInfo getBestInstance() throws NoInstanceAvailable {
-        Optional<Map.Entry<Long, InstanceInfo>> optionalMin = calculateLoadOfAllInstances().entrySet().stream()
-                .min(Comparator.comparingLong(Map.Entry::getKey));
-        if (optionalMin.isPresent())
-            return optionalMin.get().getValue();
-        throw new NoInstanceAvailable("No instance available");
-    }
 
-    public Map<Long, InstanceInfo> calculateLoadOfAllInstances() {
-        return currentInstances.values().stream().map(instanceInfo ->
-                new AbstractMap.SimpleEntry<>(instanceInfo.calculateInstanceLoad(), instanceInfo)
-        ).collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
-    }
-
-    @PostMapping("/sudoku")
+    @CrossOrigin
+    @PostMapping(value = "/sudoku", produces = "application/json")
     public String computeSudoku(@RequestBody String body,
                                 @RequestParam MultiValueMap<String,String> params) {
+
         // http://63.33.43.84:8080/sudoku?s=CP&un=81&n1=9&n2=9&i=SUDOKU_PUZZLE_9x9_101
         // {s=CP, un=81, n1=9, n2=9, i=SUDOKU_PUZZLE_9x9_101}
         // s = solver
@@ -57,16 +38,19 @@ public class SudokuRestController {
         // n1,n2 = puzzle size
         // i = map
         int attempts = 0;
+        Request reqData = new Request(params);
+        InstanceInfo bestInstance = null;
 
+        while (attempts < MAX_RETRIES) {
+            try {
+                bestInstance = loadBalancer.getBestInstance();
+                System.out.println("Load Balancer selected " + bestInstance.getInstanceData().getInstanceId());
 
-            InstanceInfo bestInstance = getBestInstance();
+                System.out.println("Params = " + params);
+                String selectedServer = bestInstance.getInstanceData().getPrivateIpAddress();
 
-            System.out.println("Params = " + params);
-            System.out.println("Body = " + body);
-            while (attempts < MAX_RETRIES) {
-                String selectedServer = bestInstance.getInstanceData().getPublicIpAddress();
                 String port = "8000";
-                Request reqData = new Request(params);
+
                 bestInstance.addRequest(reqData);
                 WebClient.RequestHeadersSpec<?> req = WebClient
                         .create("http://" + selectedServer + ":" + port)
@@ -94,10 +78,21 @@ public class SudokuRestController {
                     bestInstance.removeRequest(reqData);
 
                     return bodyResponse;
-                } else {
-                    attempts++;
+                }
+            } catch (Exception exc) {
+                try {
+                    System.out.println("Exception caught: " + exc + ", stack trace below");
+                    exc.printStackTrace();
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
+            // if crashed after adding request we should remove it or it'll stay there forever
+            if (bestInstance != null)
+                bestInstance.removeRequest(reqData);
+            attempts++;
+        }
 
         throw new IllegalStateException("Couldn't find compute unit after " + attempts + "attempts.");
 
@@ -107,7 +102,7 @@ public class SudokuRestController {
     @Override
     public String toString() {
         return "SudokuRestController{" +
-                "currentInstances=" + currentInstances +
+                "loadBalancer=" + loadBalancer +
                 '}';
     }
 }

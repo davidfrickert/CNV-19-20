@@ -1,4 +1,4 @@
-package pt.ist.meic.cnv.AutoScaler;
+package pt.ist.meic.cnv.webapp.Scaler;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,6 +12,7 @@ import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch;
 import com.amazonaws.services.cloudwatch.AmazonCloudWatchClientBuilder;
 import com.amazonaws.services.cloudwatch.model.Dimension;
@@ -26,10 +27,15 @@ import com.amazonaws.services.ec2.model.Reservation;
 import com.amazonaws.services.ec2.model.RunInstancesRequest;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
-import pt.ist.meic.cnv.SudokuSolver.webapp.SudokuRestController;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Service;
+import pt.ist.meic.cnv.webapp.Balancer.LoadBalancer;
+import pt.ist.meic.cnv.webapp.SudokuSolver.instance.InstanceInfo;
 
-public class AutoScaler {
+@Service
+public class AutoScaler extends Thread {
 
     private static AmazonEC2 ec2;
     private static AmazonCloudWatch cloudWatch;
@@ -37,15 +43,16 @@ public class AutoScaler {
     private String instanceToDelete = "none";
     private Double maximumValue = 70D;
     private Double minimumValue = 30D;
-
+    private final String amiID = "ami-0200f098c4d50a07f";
+    
     @Autowired
-    private SudokuRestController lbal;
+    private LoadBalancer lbal;
 
-    public String getInstanceToDelete(){
+    public String getInstanceToDelete() {
         return instanceToDelete;
     }
 
-    private static void init() throws Exception {
+    private static void init() {
 
         /*
          * The ProfileCredentialsProvider will return your [default]
@@ -62,8 +69,8 @@ public class AutoScaler {
                     "location (~/.aws/credentials), and is in valid format.",
                     e);
         }
-        ec2 = AmazonEC2ClientBuilder.standard().withRegion("eu-west-1").withCredentials(new AWSStaticCredentialsProvider(credentials)).build();
-        cloudWatch = AmazonCloudWatchClientBuilder.standard().withRegion("eu-west-1").withCredentials(new AWSStaticCredentialsProvider(credentials)).build();
+        ec2 = AmazonEC2ClientBuilder.standard().withRegion(Regions.EU_WEST_1).withCredentials(new AWSStaticCredentialsProvider(credentials)).build();
+        cloudWatch = AmazonCloudWatchClientBuilder.standard().withRegion(Regions.EU_WEST_1).withCredentials(new AWSStaticCredentialsProvider(credentials)).build();
     }
 
     public AutoScaler(String initialID) throws Exception {
@@ -71,14 +78,12 @@ public class AutoScaler {
         instances.put(initialID, 0D);
     }
 
-    public AutoScaler() throws Exception{
+    public AutoScaler() {
         init();
-        launchInstance();
-        String initialID = instances.keySet().iterator().next();
 
         System.out.println("Autoscaler initialized.");
-        System.out.println(lbal);
-        instances.put(initialID, 0D);
+
+        start();
     }
 
     /**
@@ -92,7 +97,10 @@ public class AutoScaler {
         List<Reservation> reservations = describeInstancesResult.getReservations();
         System.out.println("total reservations = " + reservations.size());
         for (Reservation reservation : reservations) {
-            instancesTMP.addAll(reservation.getInstances());
+            for (Instance i : reservation.getInstances()) {
+                if(i.getImageId().equals(amiID))
+                    instancesTMP.add(i);
+            }
         }
 
         System.out.println("total instances = " + instances.size());
@@ -103,20 +111,24 @@ public class AutoScaler {
      * launches a new instance
      */
     private void launchInstance(){
+        System.out.println("launched instance");
+        System.out.println(lbal);
         RunInstancesRequest runInstancesRequest = new RunInstancesRequest();
 
-        runInstancesRequest.withImageId("ami-0953f4885cd4a791b")
+        runInstancesRequest.withImageId(amiID)
                                .withInstanceType("t2.micro")
                                .withMinCount(1)
                                .withMaxCount(1)
-                               .withKeyName("CNV-2020")
-                               .withSecurityGroups("CNV-ssh+http");
+                               .withKeyName("ssh-eu")
+                               .withSecurityGroups("CNV");
 
         RunInstancesResult runInstancesResult = ec2.runInstances(runInstancesRequest);
 
-        String newInstanceId = runInstancesResult.getReservation().getInstances().get(0).getInstanceId();
+        Instance newInstance = runInstancesResult.getReservation().getInstances().get(0);
 
-        instances.put(newInstanceId, 0D);
+        instances.put(newInstance.getInstanceId(), 0D);
+        lbal.addInstance(newInstance);
+
     }
 
     /**
@@ -124,16 +136,18 @@ public class AutoScaler {
      * @param instanceId
      */
     private void terminateInstance(String instanceId){
-        if (instances.size() == 1 || instanceToDelete == "none") { return; }
-        TerminateInstancesRequest termInstanceReq = new TerminateInstancesRequest();
-        termInstanceReq.withInstanceIds(instanceId);
-        ec2.terminateInstances(termInstanceReq);
-        instances.remove(instanceId);
+        if (instances.size() == 1 || instanceToDelete.equals("none")) { return; }
+        System.out.println("Terminating " + instanceId);
+        InstanceInfo IInfo = lbal.removeInstance(instanceId);
 
+        if (IInfo != null) {
+            Thread waitForRequestsToFinish = new Thread(new WaitForReqsToFinish(IInfo));
+            waitForRequestsToFinish.start();
+        }
     }
 
     public void terminateInstance(){
-        if (instances.size() == 1 || instanceToDelete == "none") { return; }
+        if (instances.size() == 1 || instanceToDelete.equals("none")) { return; }
         
         TerminateInstancesRequest termInstanceReq = new TerminateInstancesRequest();
         termInstanceReq.withInstanceIds(instanceToDelete);
@@ -154,9 +168,19 @@ public class AutoScaler {
      */
     public void loop() throws InterruptedException {
         while (true) {
-            Thread.sleep(60000);
             updateInstances();
             checkIfActionNeeded();
+
+            Thread.sleep(180000);
+        }
+    }
+
+    @Override
+    public void run() {
+        try {
+            loop();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
@@ -164,41 +188,24 @@ public class AutoScaler {
      * Checks if we need to terminate or launch a instance
      */
     public void checkIfActionNeeded(){
-        Set<String> set = instances.keySet();
-        Iterator<String> it = set.iterator();
-
-        double smallestCPU = 100D;
-        String tmpInstanceToDel = instanceToDelete;
-
         Double avg = 0D;
-        String tmp = "none";
         
         for (Double e : instances.values()) {
-
-            String inst = it.next();
             avg += e;
-            //System.out.println(inst);
-            //System.out.println(e);
-            /*if (e > maximumValue) {
-                //System.out.println(e + " > " + maximumValue);
-                //launchInstance();
-            } else */
-            if (e < minimumValue && tmpInstanceToDel.equals("none") && e < smallestCPU) {
-                
-                tmp = inst;
-                smallestCPU = e;
-                //setInstanceToDelete(inst);
-                //System.out.println(e + " < " + minimumValue);
-                //terminateInstance(inst);
-            }
         }
 
         avg /= instances.size();
-
-        if (avg > maximumValue) {
+        System.out.println("CPU AVG: " + avg);
+        if (avg > maximumValue || instances.isEmpty()) {
             launchInstance();
-        } else if(avg < minimumValue){
-            setInstanceToDelete(tmp);
+        }
+
+        if (avg < minimumValue) {
+            String bestInstance = lbal.getBestInstance().getInstanceData().getInstanceId();
+            if(instanceToDelete.equals("none")) {
+                setInstanceToDelete(bestInstance);
+                terminateInstance(bestInstance);
+            }
         }
     }
 
@@ -239,13 +246,36 @@ public class AutoScaler {
                 }
 
                 instances.put(name, avg);
+                lbal.addInstance(instance);
             } 
         }
     }
 
-    public static void main(String[] args) throws Exception {
-        String inicialID = "i-00c12cde4ecc508ee";
-        AutoScaler ast = new AutoScaler(inicialID);
-        ast.loop();
+    @Data
+    public class WaitForReqsToFinish implements Runnable {
+        private final InstanceInfo instanceInfo;
+
+        public WaitForReqsToFinish(InstanceInfo instanceInfo) {
+            this.instanceInfo = instanceInfo;
+        }
+
+        @Override
+        public void run() {
+            while (! instanceInfo.getCurrentRequests().isEmpty()) {
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            TerminateInstancesRequest termInstanceReq = new TerminateInstancesRequest();
+            String instanceId = instanceInfo.getInstanceData().getInstanceId();
+            termInstanceReq.withInstanceIds(instanceId);
+            ec2.terminateInstances(termInstanceReq);
+            instances.remove(instanceId);
+            instanceToDelete = "none";
+        }
     }
+
+
 }

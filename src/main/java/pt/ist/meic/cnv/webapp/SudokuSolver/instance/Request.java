@@ -1,9 +1,9 @@
-package pt.ist.meic.cnv.SudokuSolver.instance;
+package pt.ist.meic.cnv.webapp.SudokuSolver.instance;
 
 import com.amazonaws.services.stepfunctions.model.MissingRequiredParameterException;
 import org.springframework.util.MultiValueMap;
-import pt.ist.meic.cnv.SudokuSolver.dynamodb.DynamoDBHelper;
-import pt.ist.meic.cnv.SudokuSolver.dynamodb.Metrics;
+import pt.ist.meic.cnv.webapp.SudokuSolver.dynamodb.DynamoDBHelper;
+import pt.ist.meic.cnv.webapp.SudokuSolver.dynamodb.Metrics;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +32,7 @@ public class Request implements IRequest {
         nLines = Integer.parseInt(requestParameters.get("n2"));
 
     }
-    //TODO
+
     @Override
     public long estimateRequestLoad() {
         DynamoDBHelper dbh = DynamoDBHelper.getInstance();
@@ -40,20 +40,23 @@ public class Request implements IRequest {
         // case of existing previous requests similar to this one
         if (metrics.size() > 0) {
             Metrics avg = Metrics.average(metrics);
-            return avg.calculateLoad();
+            long load = avg.calculateLoad();
+            System.out.println("Estimated by dynamodb: " + load);
+            return load;
         } else {
             // no similar requests to this one - base heuristic
-            return (nLines * nColumns * 10) + unassigned;
+            long load = (nLines * nColumns * 10) + unassigned;
+            System.out.println("Estimated by heuristic: " + load);
+            return load;
         }
-
     }
 
     public Map<String, Object> getRequestParams() {
         return new HashMap<>() {{
-            put("Columns", 9);
-            put("Lines", 9);
-            put("Solver-Type", "DLX");
-            put("Unassigned-Entries", 81);
+            put("Columns", nColumns);
+            put("Lines", nLines);
+            put("Solver-Type", solver);
+            put("Unassigned-Entries", unassigned);
         }};
     }
 }
