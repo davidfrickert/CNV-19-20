@@ -38,12 +38,12 @@ public class SudokuRestController {
         // n1,n2 = puzzle size
         // i = map
         int attempts = 0;
-
-
+        Request reqData = new Request(params);
+        InstanceInfo bestInstance = null;
 
         while (attempts < MAX_RETRIES) {
             try {
-                InstanceInfo bestInstance = loadBalancer.getBestInstance();
+                bestInstance = loadBalancer.getBestInstance();
                 System.out.println("Load Balancer selected " + bestInstance.getInstanceData().getInstanceId());
 
                 System.out.println("Params = " + params);
@@ -51,7 +51,7 @@ public class SudokuRestController {
                 String selectedServer = bestInstance.getInstanceData().getPrivateIpAddress();
 
                 String port = "8000";
-                Request reqData = new Request(params);
+
                 bestInstance.addRequest(reqData);
                 WebClient.RequestHeadersSpec<?> req = WebClient
                         .create("http://" + selectedServer + ":" + port)
@@ -89,6 +89,9 @@ public class SudokuRestController {
                     e.printStackTrace();
                 }
             }
+            // if crashed after adding request we should remove it or it'll stay there forever
+            if (bestInstance != null)
+                bestInstance.removeRequest(reqData);
             attempts++;
         }
 
