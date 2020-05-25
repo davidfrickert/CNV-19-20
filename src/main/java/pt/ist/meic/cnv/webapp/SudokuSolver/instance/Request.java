@@ -42,6 +42,7 @@ public class Request implements IRequest {
         // case of existing previous requests similar to this one
         if (metrics.size() > 0) {
             Metrics avg = Metrics.average(metrics);
+            System.out.println("Avg metrics = " + avg);
             long load = avg.calculateLoad();
             System.out.println("Estimated by dynamodb: " + load);
             return load;
